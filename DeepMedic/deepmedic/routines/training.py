@@ -64,6 +64,12 @@ def trainOrValidateForSubepoch( log,
             
             index_to_data_for_batch_min = batch_i * cnn3d.batchSize["train"]
             index_to_data_for_batch_max = (batch_i + 1) * cnn3d.batchSize["train"]
+
+            xin1 = channsOfSegmentsForSubepPerPathway[0][index_to_data_for_batch_min: index_to_data_for_batch_max]
+            xin2 = channsOfSegmentsForSubepPerPathway[1][index_to_data_for_batch_min: index_to_data_for_batch_max]
+            xin3 = channsOfSegmentsForSubepPerPathway[2][index_to_data_for_batch_min: index_to_data_for_batch_max]
+            yout = labelsForCentralOfSegmentsForSubep[index_to_data_for_batch_min: index_to_data_for_batch_max]
+            feeds = cnn3d.get_main_feeds('train')
             
             ###################################### Adversarail Training  ##################################################################################
             # After learning after an epoch, we should get r_vadv
@@ -73,11 +79,6 @@ def trainOrValidateForSubepoch( log,
 
                 list_of_opsupdate = [ops_to_fetch['d0']] + [ops_to_fetch['ds0']] + [ops_to_fetch['ds1']]
 
-                xin1 = channsOfSegmentsForSubepPerPathway[0][index_to_data_for_batch_min: index_to_data_for_batch_max]
-                xin2 = channsOfSegmentsForSubepPerPathway[1][index_to_data_for_batch_min: index_to_data_for_batch_max]
-                xin3 = channsOfSegmentsForSubepPerPathway[2][index_to_data_for_batch_min: index_to_data_for_batch_max]
-                yout = labelsForCentralOfSegmentsForSubep[index_to_data_for_batch_min: index_to_data_for_batch_max]
-
                 d1n = np.random.normal(0, 1, [xin1.shape[0], xin1.shape[1], xin1.shape[2], xin1.shape[3], xin1.shape[4]])
                 d2n = np.random.normal(0, 1, [xin2.shape[0], xin2.shape[1], xin2.shape[2], xin2.shape[3], xin2.shape[4]])
                 d3n = np.random.normal(0, 1, [xin3.shape[0], xin3.shape[1], xin3.shape[2], xin3.shape[3], xin3.shape[4]])
@@ -86,7 +87,6 @@ def trainOrValidateForSubepoch( log,
                 d2n = n_xi * get_normalized_vector(d2n)
                 d3n = n_xi * get_normalized_vector(d3n)
 
-                feeds = cnn3d.get_main_feeds('train')
                 feeds_dictp = {feeds['x']: xin1}
                 feeds_dictp.update({feeds['x_sub_' + str(0)]: xin2})
                 feeds_dictp.update({feeds['x_sub_' + str(1)]: xin3})

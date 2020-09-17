@@ -205,3 +205,10 @@ venv.bak/
 # mypy
 
 .mypy_cache/
+
+
+/cmd.sh
+
+
+examples/configFiles/deepMedic/train/brats/sens*
+
