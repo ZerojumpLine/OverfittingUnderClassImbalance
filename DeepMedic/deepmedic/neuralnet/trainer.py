@@ -115,6 +115,7 @@ class Trainer(object):
         y_gtmix1 = self._net._output_gt_tensor_feeds['train']['y_gt1']
         mixup_lambda = self._net._output_gt_tensor_feeds['train']['mixup_lambda']
         if "xentr" in self._losses_and_weights and self._losses_and_weights["xentr"] is not None:
+            y_gt = y_gtmix0
             log.print3("COST: Using cross entropy with weight: " + str(self._losses_and_weights["xentr"]))
             w_per_cl_vec = self._compute_w_per_class_vector_for_xentr(self._net.num_classes, y_gt)
             cost += self._losses_and_weights["xentr"] * cfs.x_entr(self._net.finalTargetLayer.p_y_given_x_train, y_gt, w_per_cl_vec)
@@ -128,7 +129,7 @@ class Trainer(object):
             log.print3("COST: Using focal loss one side cross entropy with weight: " + str(self._losses_and_weights["focaloneside"]))
             log.print3("COST: Using focal loss one side cross entropy with gama: " + str(self._losses_and_weights["focalonesidegama"]))
             w_per_cl_vec = self._compute_w_per_class_vector_for_xentr(self._net.num_classes, y_gtmix0, y_gtmix1)
-            cost += self._losses_and_weights["focaloneside"] * cfs.focaloneside(self._net.finalTargetLayer.p_y_given_x_train, y_gtmix0, y_gtmix1, self._losses_and_weights["focalonesidegama"], w_per_cl_vec, self._mixup_biasmargin, self._marginm, mixup_lambda)
+            cost += self._losses_and_weights["focaloneside"] * cfs.focaloneside(self._net.finalTargetLayer.p_y_given_x_train_network_output, y_gtmix0, y_gtmix1, self._losses_and_weights["focalonesidegama"], w_per_cl_vec, self._mixup_biasmargin, self._marginm, mixup_lambda)
             
         cost_L1_reg = self._L1_reg_weight * self._net._get_L1_cost()
         cost_L2_reg = self._L2_reg_weight * self._net._get_L2_cost()        

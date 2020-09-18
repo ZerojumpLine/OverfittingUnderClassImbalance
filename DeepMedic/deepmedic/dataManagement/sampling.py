@@ -340,8 +340,10 @@ def load_subj_and_get_samples(log,
         for image_part_i in range(len(coords_of_samples[0][0])):
             coordsOfCentralVoxelOfThisImPart = coords_of_samples[0][:, image_part_i]
 
-            Augmflag = cat_i != 0 or random.uniform(0,1) > probaugmentbackground
-            # half of the BG need augmentation.
+            Augmflag = cat_i != 0 or probaugmentbackground > random.uniform(0,1)
+            '''
+            To see if the background samples need augmentation
+            '''
 
             [channelsForThisImagePartPerPathway,
              gtLabelsForTheCentralClassifiedPartOfThisImagePart  # used to be gtLabelsForThisImagePart, before extracting only for the central voxels.
