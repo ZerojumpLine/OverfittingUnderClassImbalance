@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0d31e687-5d86-412e-94e3-5aa4391edcdd" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deepmedic/neuralnet/cost_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/deepmedic/neuralnet/cost_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deepmedic/neuralnet/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/deepmedic/neuralnet/trainer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deepmedic/routines/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/deepmedic/routines/training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Unet/nnunet/training/loss_functions/mixND_Crossentropy.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Unet/nnunet/training/loss_functions/mixND_Crossentropy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +23,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Unet" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../dm-private-overfit" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/../../dm-private-overfit/deepmedic/routines/training.py" />
   </component>
@@ -44,7 +41,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/deepMedicRun" />
-      <option name="PARAMETERS" value="-model ./examples/configFiles/deepMedic/model/modelConfigbasic.cfg -train ./examples/configFiles/deepMedic/train/brats/sens_trainConfig_bratscore_10percent_basicsetting_asymmetricfocal4.cfg -dev cuda1" />
+      <option name="PARAMETERS" value="-model ./examples/configFiles/deepMedic/model/modelConfigbasic.cfg -train ./examples/configFiles/deepMedic/train/brats/sens_trainConfig_bratscore_20percent_basicsetting_asymmetricmargin1.cfg -dev cuda1" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -84,10 +81,10 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="2318" y="249" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1600385619558">
+    <state x="2318" y="249" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1600627331265">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state x="2318" y="249" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600385619558" />
+    <state x="2318" y="249" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600627331265" />
     <state x="451" y="270" key="#com.intellij.execution.impl.EditConfigurationsDialog/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600038959666" />
     <state x="667" y="299" width="642" height="627" key="#deepMedicRun" timestamp="1600036798971">
       <screen x="67" y="27" width="1853" height="1173" />
@@ -97,55 +94,70 @@
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
     <state x="2087" y="125" width="1653" height="975" key="DiffContextDialog/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600552193961" />
-    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl" timestamp="1600617572025">
+    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl" timestamp="1600627057503">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600617572025" />
+    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600627057503" />
     <state x="776" y="370" width="424" height="484" key="FileChooserDialogImpl/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042258452" />
-    <state width="1830" height="300" key="GridCell.Tab.0.bottom" timestamp="1600424109330">
+    <state width="1830" height="392" key="GridCell.Tab.0.bottom" timestamp="1600627437214">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state width="1830" height="300" key="GridCell.Tab.0.bottom/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600424109330" />
+    <state width="1830" height="392" key="GridCell.Tab.0.bottom/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600627437214" />
     <state width="1830" height="72" key="GridCell.Tab.0.bottom/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042259614" />
-    <state width="1830" height="300" key="GridCell.Tab.0.center" timestamp="1600424109330">
+    <state width="1830" height="392" key="GridCell.Tab.0.center" timestamp="1600627437214">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state width="1830" height="300" key="GridCell.Tab.0.center/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600424109330" />
+    <state width="1830" height="392" key="GridCell.Tab.0.center/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600627437214" />
     <state width="1830" height="72" key="GridCell.Tab.0.center/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042259614" />
-    <state width="1830" height="300" key="GridCell.Tab.0.left" timestamp="1600424109330">
+    <state width="1830" height="392" key="GridCell.Tab.0.left" timestamp="1600627437214">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state width="1830" height="300" key="GridCell.Tab.0.left/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600424109330" />
+    <state width="1830" height="392" key="GridCell.Tab.0.left/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600627437214" />
     <state width="1830" height="72" key="GridCell.Tab.0.left/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042259614" />
-    <state width="1830" height="300" key="GridCell.Tab.0.right" timestamp="1600424109330">
+    <state width="1830" height="392" key="GridCell.Tab.0.right" timestamp="1600627437214">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state width="1830" height="300" key="GridCell.Tab.0.right/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600424109330" />
+    <state width="1830" height="392" key="GridCell.Tab.0.right/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600627437214" />
     <state width="1830" height="72" key="GridCell.Tab.0.right/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042259614" />
-    <state width="1830" height="300" key="GridCell.Tab.1.bottom" timestamp="1600424165237">
+    <state width="1830" height="392" key="GridCell.Tab.1.bottom" timestamp="1600627437080">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state width="1830" height="300" key="GridCell.Tab.1.bottom/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600424165237" />
+    <state width="1830" height="392" key="GridCell.Tab.1.bottom/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600627437080" />
     <state width="1830" height="72" key="GridCell.Tab.1.bottom/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042259614" />
-    <state width="1830" height="300" key="GridCell.Tab.1.center" timestamp="1600424165237">
+    <state width="1830" height="392" key="GridCell.Tab.1.center" timestamp="1600627437080">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state width="1830" height="300" key="GridCell.Tab.1.center/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600424165237" />
+    <state width="1830" height="392" key="GridCell.Tab.1.center/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600627437080" />
     <state width="1830" height="72" key="GridCell.Tab.1.center/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042259614" />
-    <state width="1830" height="300" key="GridCell.Tab.1.left" timestamp="1600424165237">
+    <state width="1830" height="392" key="GridCell.Tab.1.left" timestamp="1600627437080">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state width="1830" height="300" key="GridCell.Tab.1.left/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600424165237" />
+    <state width="1830" height="392" key="GridCell.Tab.1.left/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600627437080" />
     <state width="1830" height="72" key="GridCell.Tab.1.left/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042259614" />
-    <state width="1830" height="300" key="GridCell.Tab.1.right" timestamp="1600424165237">
+    <state width="1830" height="392" key="GridCell.Tab.1.right" timestamp="1600627437080">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state width="1830" height="300" key="GridCell.Tab.1.right/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600424165237" />
+    <state width="1830" height="392" key="GridCell.Tab.1.right/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600627437080" />
     <state width="1830" height="72" key="GridCell.Tab.1.right/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042259614" />
-    <state x="2350" y="225" key="SettingsEditor" timestamp="1600385516801">
+    <state x="2350" y="225" key="SettingsEditor" timestamp="1600619643984">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state x="2350" y="225" key="SettingsEditor/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600385516801" />
+    <state x="2350" y="225" key="SettingsEditor/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600619643984" />
     <state x="482" y="247" key="SettingsEditor/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600037764840" />
+    <state x="2569" y="440" key="com.intellij.ide.util.TipDialog" timestamp="1600621489299">
+      <screen x="1920" y="0" width="1920" height="1200" />
+    </state>
+    <state x="2569" y="440" key="com.intellij.ide.util.TipDialog/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600621489299" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/deepmedic/neuralnet/cost_functions.py</url>
+          <line>72</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
