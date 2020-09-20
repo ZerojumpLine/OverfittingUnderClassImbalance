@@ -22,8 +22,12 @@ class mixCrossentropyND(nn.Module):
     """
     def __init__(self, asy, margin, inner, gama, marginm, weights):
         super(mixCrossentropyND, self).__init__()
+        '''
+        Be careful of the two margin (one for large margin loss, one for mixup), do not mess it up.
+        specifically, margin is for mixup, marginm is for large margin loss.
+        '''
         self.asy = asy
-        self.margin = margin
+        self.margin = 1 - margin
         self.inner = inner
         self.gama = gama
         self.marginm = marginm
@@ -89,11 +93,6 @@ class mixCrossentropyND(nn.Module):
             y_comb0 = torch.where(targetmix == tumorlabel, targetmix, target)
             y_comb1 = torch.where(target == tumorlabel, target, targetmix)
 
-            # here it is a littler dumpy, considering that CT background intensity is too low
-            # I dont mix tumor with background.
-            # y_comb0 = torch.where(target != 0, y_comb0, target)
-            # y_comb1 = torch.where(targetmix != 0, y_comb1, targetmix)
-
             # if the another component mixup lambda is less than the margin, set as tumor
             if lam < self.margin:
                 y_one_hot = self.one_hot_embedding(y_comb0.data.cpu(), num_classes)
@@ -140,14 +139,14 @@ class mixCrossentropyND(nn.Module):
 
         if self.asy == 0:
             # have margin on all classes.
-            inpmargin = torch.stack((inp[:, 0] - self.margin, inp[:, 1] - self.margin, inp[:, 2] - self.margin), 1)
+            inpmargin = torch.stack((inp[:, 0] - self.marginm, inp[:, 1] - self.marginm, inp[:, 2] - self.marginm), 1)
             # preserve the other sums
             inppost = torch.stack((inp[:, 0] * (target != 0).float() + inpmargin[:, 0] * (target == 0).float(),
                                    inp[:, 1] * (target != 1).float() + inpmargin[:, 1] * (target == 1).float(),
                                    inp[:, 2] * (target != 2).float() + inpmargin[:, 2] * (target == 2).float()), 1)
         if self.asy == 1:
             # have margin only on foreground class
-            inpmargin = torch.stack((inp[:, 0], inp[:, 1] - self.margin, inp[:, 2] - self.margin), 1)
+            inpmargin = torch.stack((inp[:, 0], inp[:, 1] - self.marginm, inp[:, 2] - self.marginm), 1)
             # preserve the other sums
             inppost = torch.stack((inp[:, 0] * (target != 0).float() + inpmargin[:, 0] * (target == 0).float(),
                                    inp[:, 1] * (target != 1).float() + inpmargin[:, 1] * (target == 1).float(),

@@ -3,12 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="0d31e687-5d86-412e-94e3-5aa4391edcdd" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deepmedic/dataManagement/sampling.py" beforeDir="false" afterPath="$PROJECT_DIR$/deepmedic/dataManagement/sampling.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deepmedic/neuralnet/cost_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/deepmedic/neuralnet/cost_functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deepmedic/neuralnet/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/deepmedic/neuralnet/trainer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deepmedic/routines/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/deepmedic/routines/training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/configFiles/deepMedic/train/ATLAS/trainConfig_ATLAS_50percent_defaultsetting_asymmetricfocal.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/examples/configFiles/deepMedic/train/ATLAS/trainConfig_ATLAS_50percent_defaultsetting_asymmetricfocal.cfg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/configFiles/deepMedic/train/brats/trainConfig_bratscore_10percent_basicsetting_asymmetricfocal.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/examples/configFiles/deepMedic/train/brats/trainConfig_bratscore_10percent_basicsetting_asymmetricfocal.cfg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Unet/nnunet/training/loss_functions/mixND_Crossentropy.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Unet/nnunet/training/loss_functions/mixND_Crossentropy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,9 +26,9 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../dm-private-overfit" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Unet" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
-    <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/../../dm-private-overfit/deepmedic/neuralnet/cnn3d.py" />
+    <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/../../dm-private-overfit/deepmedic/routines/training.py" />
   </component>
   <component name="RunManager">
     <configuration name="deepMedicRun" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -95,14 +93,14 @@
       <screen x="67" y="27" width="1853" height="1173" />
     </state>
     <state x="667" y="299" width="642" height="627" key="#deepMedicRun/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600036798971" />
-    <state x="2087" y="125" width="1653" height="975" key="DiffContextDialog" timestamp="1600425335305">
+    <state x="2087" y="125" width="1653" height="975" key="DiffContextDialog" timestamp="1600552193961">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state x="2087" y="125" width="1653" height="975" key="DiffContextDialog/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600425335305" />
-    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl" timestamp="1600459657386">
+    <state x="2087" y="125" width="1653" height="975" key="DiffContextDialog/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600552193961" />
+    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl" timestamp="1600617572025">
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
-    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600459657386" />
+    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600617572025" />
     <state x="776" y="370" width="424" height="484" key="FileChooserDialogImpl/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042258452" />
     <state width="1830" height="300" key="GridCell.Tab.0.bottom" timestamp="1600424109330">
       <screen x="1920" y="0" width="1920" height="1200" />

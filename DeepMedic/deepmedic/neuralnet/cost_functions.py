@@ -60,6 +60,7 @@ def focaloneside(p_y_given_x_train_network_output, y_gtmixp0, y_gtmixp1, gama, w
     # weightPerClass is a vector with 1 element per class.
 
     '''
+    Watchout, p_y_given_x_train_network_output does not have non linear, we do softmax here.
     It now only supports binary class segmentation (brats/ ATLAS)
     However, it should not be difficult to extend, but needs good designs...
     '''
@@ -108,7 +109,7 @@ def focaloneside(p_y_given_x_train_network_output, y_gtmixp0, y_gtmixp1, gama, w
     y_gtmix_bool = tf.cast(y_gtmix, tf.bool)
 
     if mixupbiasmargin > 0: # asymmetric mixup
-        lambdathreshold = tf.constant(mixupbiasmargin, dtype=tf.float32)
+        lambdathreshold = tf.constant(1-mixupbiasmargin, dtype=tf.float32)
 
         y_gtmix0 = tf.cond(tf.less(mixuplambda, lambdathreshold), lambda: tf.cast(y_gtmix_bool, tf.int32), lambda: y_gtmixp0)
         y_gtmix1 = tf.cond(tf.less(1 - mixuplambda, lambdathreshold), lambda: tf.cast(y_gtmix_bool, tf.int32), lambda: y_gtmixp1)

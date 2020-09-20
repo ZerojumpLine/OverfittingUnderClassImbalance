@@ -61,7 +61,8 @@ def trainOrValidateForSubepoch( log,
                 log.print3( "[TRAINING] Trained on "+str(batch_i+1)+"/"+str(num_batches)+" of the batches for this subepoch...")
             
             ops_to_fetch = cnn3d.get_main_ops('train')
-            
+            list_of_ops = [ ops_to_fetch['cost'] ] + ops_to_fetch['list_rp_rn_tp_tn'] + [ ops_to_fetch['updates_grouped_op'] ]
+
             index_to_data_for_batch_min = batch_i * cnn3d.batchSize["train"]
             index_to_data_for_batch_max = (batch_i + 1) * cnn3d.batchSize["train"]
 
@@ -150,9 +151,10 @@ def trainOrValidateForSubepoch( log,
                 sessionTf.run(fetches=list_of_ops, feed_dict=feeds_dictadv)
 
             ## the forth step, mixup #######################
-
-            ## in some case, I dont want mixup samples
-            ## then I set mixup_rate = 0.
+            '''
+            in some case, I dont want mixup samples
+            then I set mixup_rate = 0.
+            '''
 
             if mixup_rate > 0 :
 
