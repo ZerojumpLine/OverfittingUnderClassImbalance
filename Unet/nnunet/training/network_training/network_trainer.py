@@ -608,7 +608,7 @@ class NetworkTrainer(object):
 
         ## the last step, train using the mixuped results
         if self.margin > 0:
-            lam = np.random.beta(self.alpha, self.alpha) * self.margin
+            lam = np.random.beta(self.alpha, self.alpha) * (1- self.margin)
             # just emphasize the effect by collecting more middle regions
             datamix = dataasy.flip(0)
             datamixup = lam * dataasy + (1. - lam) * datamix

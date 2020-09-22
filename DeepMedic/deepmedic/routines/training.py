@@ -169,7 +169,7 @@ def trainOrValidateForSubepoch( log,
                 xsubin1mix = channsOfSegmentsForSubepPerPathway[2][index_to_data_for_batch_min_mixup: index_to_data_for_batch_min_mixup + batchsize]
                 y0mix = labelsForCentralOfSegmentsForSubep[index_to_data_for_batch_min_mixup: index_to_data_for_batch_min_mixup + batchsize]
 
-                mixup_lambda = np.random.beta(mixup_rate, mixup_rate) * mixup_biasmargin
+                mixup_lambda = np.random.beta(mixup_rate, mixup_rate) * (1-mixup_biasmargin)
 
                 xin0mixup = mixup_lambda * xin1 + (1 - mixup_lambda) * xin0mix
                 xsubin0mixup = mixup_lambda * xin2 + (1 - mixup_lambda) * xsubin0mix
