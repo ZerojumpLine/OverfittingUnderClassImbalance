@@ -24,7 +24,7 @@ from deepmedic.logging.utils import datetimeNowAsStr
 
 def get_normalized_vector(d):
     for k in range(0, d.shape[0]):
-        d[k, :, :, :, :] /= (1e-12 + np.max(d[k,:,:,:,:]))
+        d[k, :, :, :, :] /= (1e-12 + np.max(np.abs(d[k,:,:,:,:])))
         d[k, :, :, :, :] /= np.sqrt(1e-6 + np.sum(np.square(d[k, :, :, :, :])))
     return d
 
@@ -59,7 +59,7 @@ def trainOrValidateForSubepoch( log,
         if train_or_val=="train" :
             if batch_i == 0 or ((batch_i+1) % print_progress_step) == 0 or (batch_i+1) == num_batches :
                 log.print3( "[TRAINING] Trained on "+str(batch_i+1)+"/"+str(num_batches)+" of the batches for this subepoch...")
-            
+
             ops_to_fetch = cnn3d.get_main_ops('train')
 
             index_to_data_for_batch_min = batch_i * cnn3d.batchSize["train"]
@@ -70,7 +70,7 @@ def trainOrValidateForSubepoch( log,
             xin3 = channsOfSegmentsForSubepPerPathway[2][index_to_data_for_batch_min: index_to_data_for_batch_max]
             yout = labelsForCentralOfSegmentsForSubep[index_to_data_for_batch_min: index_to_data_for_batch_max]
             feeds = cnn3d.get_main_feeds('train')
-            
+
             ###################################### Adversarail Training  ##################################################################################
             '''
             After learning after an epoch, we should get r_vadv first
@@ -81,9 +81,14 @@ def trainOrValidateForSubepoch( log,
 
                 list_of_opsupdate = [ops_to_fetch['d0']] + [ops_to_fetch['ds0']] + [ops_to_fetch['ds1']]
 
-                d1n = np.random.normal(0, 1, [xin1.shape[0], xin1.shape[1], xin1.shape[2], xin1.shape[3], xin1.shape[4]])
-                d2n = np.random.normal(0, 1, [xin2.shape[0], xin2.shape[1], xin2.shape[2], xin2.shape[3], xin2.shape[4]])
-                d3n = np.random.normal(0, 1, [xin3.shape[0], xin3.shape[1], xin3.shape[2], xin3.shape[3], xin3.shape[4]])
+                # d1n = np.random.normal(0, 1, [xin1.shape[0], xin1.shape[1], xin1.shape[2], xin1.shape[3], xin1.shape[4]])
+                # d2n = np.random.normal(0, 1, [xin2.shape[0], xin2.shape[1], xin2.shape[2], xin2.shape[3], xin2.shape[4]])
+                # d3n = np.random.normal(0, 1, [xin3.shape[0], xin3.shape[1], xin3.shape[2], xin3.shape[3], xin3.shape[4]])
+
+                # For experiments with brats, I found np.random.rand() is more useful.
+                d1n = np.random.rand(xin1.shape[0], xin1.shape[1], xin1.shape[2], xin1.shape[3], xin1.shape[4]) - 0.5
+                d2n = np.random.rand(xin2.shape[0], xin2.shape[1], xin2.shape[2], xin2.shape[3], xin2.shape[4]) - 0.5
+                d3n = np.random.rand(xin3.shape[0], xin3.shape[1], xin3.shape[2], xin3.shape[3], xin3.shape[4]) - 0.5
 
                 d1n = n_xi * get_normalized_vector(d1n)
                 d2n = n_xi * get_normalized_vector(d2n)
@@ -107,7 +112,7 @@ def trainOrValidateForSubepoch( log,
             normal training, just like nothing happen
             '''
 
-            list_of_ops = [ops_to_fetch['cost']] + ops_to_fetch['list_rp_rn_tp_tn'] + [ops_to_fetch['updates_grouped_op']]
+            list_of_ops = [ops_to_fetch['cost']] + ops_to_fetch['list_rp_rn_tp_tn'] + [ops_to_fetch['updates_grouped_op']] + [ops_to_fetch['advflag']]
 
             d1z = np.zeros(xin1.shape)
             d2z = np.zeros(xin2.shape)
@@ -124,6 +129,8 @@ def trainOrValidateForSubepoch( log,
             feeds_dictnormal.update({feeds['mixup_lambda']: 1})
 
             results_of_run = sessionTf.run(fetches=list_of_ops, feed_dict=feeds_dictnormal)
+            # see the flag.
+            # print(results_of_run[-1])
 
             cnn3d.updateMatricesOfBnMovingAvForInference(sessionTf)  # I should put this inside the 3dCNN.
 
@@ -192,7 +199,7 @@ def trainOrValidateForSubepoch( log,
             #######################################################################################################################################################
 
             cost_this_batch = results_of_run[0]
-            list_RpRnPpPn_per_class = results_of_run[1:-1] # [-1] is from updates_grouped_op that returns nothing.
+            list_RpRnPpPn_per_class = results_of_run[1:-2] # [-1] is from updates_grouped_op that returns nothing.
             
         else : #validation
             if batch_i == 0 or ((batch_i+1) % print_progress_step) == 0 or (batch_i+1) == num_batches :

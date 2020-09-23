@@ -190,6 +190,7 @@ class Cnn3d(object):
         self._ops_main['train']['d0'] = self.d0
         self._ops_main['train']['ds0'] = self.ds0
         self._ops_main['train']['ds1'] = self.ds1
+        self._ops_main['train']['advflag'] = self.advflag
 
         self._feeds_main['train']['x'] = self._inp_x['train']['x']
         for subpath_i in range(self.numSubsPaths) : # if there are subsampled paths...
@@ -333,6 +334,7 @@ class Cnn3d(object):
                         ):
         
         self.cnnModelName = cnnModelName
+        self.nside = nside
         
         # ============= Model Parameters Passed as arguments ================
         self.num_classes = numberOfOutputClasses
@@ -571,23 +573,43 @@ class Cnn3d(object):
 
         log.print3("Finding the distance direction...")
 
+        self.advflag = tf.cond(tf.greater(tf.reduce_max(self._disturb_x['train']['x']), tf.constant(0, dtype=tf.float32)), lambda: 1.0, lambda: 0.0)
+        self.advfunc()
+        # self.d0 = 0
+        # self.ds0 = 0
+        # self.ds1 = 0
+
+        '''
+        I am not sure the implementation here is optimal. Specifically, it would calcualte gradients for d1/d2/d3 every epoch
+        However, we only want it when advflag = 1...I leave it here, because it does not cause any troubles so far.
+        '''
+
+        ################################################################################
+
+        log.print3("Finished building the CNN's model.")
+
+    def advfunc(self):
+
         eps = 1e-6
 
         y_gt = self._output_gt_tensor_feeds['train']['y_gt0']
 
         log_p_y_given_x_train = tf.log(self.finalTargetLayer.p_y_given_x_train + eps)
-        y_one_hot = tf.one_hot(indices=y_gt, depth=tf.shape(self.finalTargetLayer.p_y_given_x_train)[1], axis=1, dtype="float32")
+        y_one_hot = tf.one_hot(indices=y_gt, depth=tf.shape(self.finalTargetLayer.p_y_given_x_train)[1], axis=1,
+                               dtype="float32")
         num_samples = tf.cast(tf.reduce_prod(tf.shape(y_gt)), "float32")
 
         x_entrall = log_p_y_given_x_train * y_one_hot
 
-
-        if nside == 1: # only for the tumour samples
+        if self.nside == 1:  # only for the tumour samples
             x_entr = - (1. / num_samples) * tf.reduce_sum(x_entrall[:, 1, :, :, :])
-        if nside == 2: # for both tumour and backgr samples
+        if self.nside == 2:  # for both tumour and backgr samples
             x_entr = - (1. / num_samples) * tf.reduce_sum(x_entrall)
 
-        [grad1, grad2, grad3] = tf.gradients(x_entr, [self._disturb_x['train']['x'], self._disturb_x['train']['x_sub_0'], self._disturb_x['train']['x_sub_1']], aggregation_method=2)
+        ## this part borrowed from tf_vat
+        [grad1, grad2, grad3] = tf.gradients(x_entr,
+                                             [self._disturb_x['train']['x'], self._disturb_x['train']['x_sub_0'],
+                                              self._disturb_x['train']['x_sub_1']], aggregation_method=2)
         d1 = tf.stop_gradient(grad1)
         d2 = tf.stop_gradient(grad2)
         d3 = tf.stop_gradient(grad3)
@@ -597,9 +619,10 @@ class Cnn3d(object):
         self.ds0 = get_normalized_vector(d2)
         self.ds1 = get_normalized_vector(d3)
 
-        ################################################################################
-        
-        log.print3("Finished building the CNN's model.")
+        return 1
+
+    def normalfunc(self):
+        return 0
         
         
 def get_normalized_vector(d):
