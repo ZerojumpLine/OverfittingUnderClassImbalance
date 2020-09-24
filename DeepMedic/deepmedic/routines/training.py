@@ -86,9 +86,9 @@ def trainOrValidateForSubepoch( log,
                 # d3n = np.random.normal(0, 1, [xin3.shape[0], xin3.shape[1], xin3.shape[2], xin3.shape[3], xin3.shape[4]])
 
                 # For experiments with brats, I found np.random.rand() is more useful.
-                d1n = np.random.rand(xin1.shape[0], xin1.shape[1], xin1.shape[2], xin1.shape[3], xin1.shape[4]) - 0.5
-                d2n = np.random.rand(xin2.shape[0], xin2.shape[1], xin2.shape[2], xin2.shape[3], xin2.shape[4]) - 0.5
-                d3n = np.random.rand(xin3.shape[0], xin3.shape[1], xin3.shape[2], xin3.shape[3], xin3.shape[4]) - 0.5
+                d1n = np.random.rand(xin1.shape[0], xin1.shape[1], xin1.shape[2], xin1.shape[3], xin1.shape[4])
+                d2n = np.random.rand(xin2.shape[0], xin2.shape[1], xin2.shape[2], xin2.shape[3], xin2.shape[4])
+                d3n = np.random.rand(xin3.shape[0], xin3.shape[1], xin3.shape[2], xin3.shape[3], xin3.shape[4])
 
                 d1n = n_xi * get_normalized_vector(d1n)
                 d2n = n_xi * get_normalized_vector(d2n)
