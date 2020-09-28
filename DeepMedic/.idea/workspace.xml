@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0d31e687-5d86-412e-94e3-5aa4391edcdd" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deepmedic/routines/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/deepmedic/routines/training.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deepmedic/neuralnet/cost_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/deepmedic/neuralnet/cost_functions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,11 +94,11 @@
       <screen x="1920" y="0" width="1920" height="1200" />
     </state>
     <state x="2087" y="125" width="1653" height="975" key="DiffContextDialog/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600552193961" />
-    <state x="2655" y="316" width="424" height="484" key="FileChooserDialogImpl" timestamp="1600787722531">
-      <screen x="1920" y="0" width="1920" height="1080" />
+    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl" timestamp="1601298653582">
+      <screen x="1920" y="0" width="1920" height="1200" />
     </state>
     <state x="2655" y="316" width="424" height="484" key="FileChooserDialogImpl/0.27.1920.1173/1920.0.1920.1080@1920.0.1920.1080" timestamp="1600787722531" />
-    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600637424159" />
+    <state x="2655" y="351" width="424" height="484" key="FileChooserDialogImpl/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1601298653582" />
     <state x="776" y="370" key="FileChooserDialogImpl/1920.0.1920.1200/3840.0.1920.1080/67.27.1853.1173@67.27.1853.1173" timestamp="1600689211037" />
     <state x="776" y="370" width="424" height="484" key="FileChooserDialogImpl/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600042258452" />
     <state width="1830" height="2" key="GridCell.Tab.0.bottom" timestamp="1600898868640">
@@ -154,9 +154,10 @@
     </state>
     <state x="2350" y="225" key="SettingsEditor/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600619643984" />
     <state x="482" y="247" key="SettingsEditor/67.27.1853.1173/1920.0.1920.1080@67.27.1853.1173" timestamp="1600037764840" />
-    <state x="2569" y="440" key="com.intellij.ide.util.TipDialog" timestamp="1600621489299">
-      <screen x="1920" y="0" width="1920" height="1200" />
+    <state x="649" y="457" key="com.intellij.ide.util.TipDialog" timestamp="1601298655698">
+      <screen x="0" y="27" width="1920" height="1173" />
     </state>
-    <state x="2569" y="440" key="com.intellij.ide.util.TipDialog/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1600621489299" />
+    <state x="649" y="457" key="com.intellij.ide.util.TipDialog/1920.0.1920.1200/3840.0.1920.1080/0.27.1920.1173@1920.0.1920.1200" timestamp="1601298655698" />
+    <state x="2569" y="440" key="com.intellij.ide.util.TipDialog/67.27.1853.1053/1920.0.1920.1200@1920.0.1920.1200" timestamp="1601221028405" />
   </component>
 </project>

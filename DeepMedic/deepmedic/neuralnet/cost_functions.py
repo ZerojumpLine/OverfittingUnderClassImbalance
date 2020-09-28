@@ -136,7 +136,7 @@ def focaloneside(p_y_given_x_train_network_output, y_gtmixp0, y_gtmixp1, gama, w
     '''
 
     if gama < 0: # do it only for the background cls
-        focal_conduct_active = (1 - p_y_given_x_train) ** abs(gama)
+        focal_conduct_active = (1 - p_y_given_x_train + eps) ** abs(gama)
         a = tf.ones([focal_conduct_active.shape[0], 1, focal_conduct_active.shape[2], focal_conduct_active.shape[3], focal_conduct_active.shape[4]])
         focal_conduct = tf.concat([focal_conduct_active[:, 0:1, :, :, :], a], 1)
     else: # normal focal loss
