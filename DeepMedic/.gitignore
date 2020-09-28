@@ -212,3 +212,4 @@ venv.bak/
 
 examples/configFiles/deepMedic/train/brats/sens*
 
+examples/configFiles/deepMedic/test/*
