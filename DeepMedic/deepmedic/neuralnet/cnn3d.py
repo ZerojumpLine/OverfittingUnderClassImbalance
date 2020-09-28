@@ -329,7 +329,7 @@ class Cnn3d(object):
                         applyBnToInputOfPathways,  # one Boolean flag per pathway type. Placeholder for the FC pathway.
                         movingAvForBnOverXBatches,
 
-                        nside
+                        nside = 2
                         
                         ):
         
