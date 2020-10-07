@@ -10,13 +10,12 @@ pytorch==1.1.0
 ## Data and preprocssing
 1. Download the data from [KiTS19](https://github.com/neheller/kits19).
 2. (Optional) Resample the datasest to a uniform space with 1.6mm * 1.6mm * 3.2mm
-3. Convert the dataset following nnU-Net's [instructions](https://github.com/MIC-DKFZ/nnUNet/blob/master/documentation/dataset_conversion.md). I name the KiTS dataset as Task01_Kits.
-4. Run the preprocessing with 
+3. Set your path in `./nnunet/paths.py`. Basically, set *base* as where you save your dataset.
+4. Convert the dataset following nnU-Net's [instructions](https://github.com/MIC-DKFZ/nnUNet/blob/master/documentation/dataset_conversion.md). I name the KiTS dataset as Task01_Kits.
+5. Run the preprocessing with 
     ```
     python experiment_planning/plan_and_preprocess_task.py -t Task01_Kits
     ```
-5. Set your path in `./nnunet/paths.py`. Basically, set *base* as where you set your dataset.
-
 
 ## Train
 - (Optional) let nnU-Net create the default split file (by running one epoch but stop), change split in  'preprocessing_output_dir/Task01_Kits/splits_final.pkl'. I set different folders with different portion of training data. Folder 0 stands for 100%, folder 2 stands for 50% and folder 3 stands for 10%.
