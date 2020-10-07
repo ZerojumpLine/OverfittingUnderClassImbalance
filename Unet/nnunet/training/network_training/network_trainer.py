@@ -534,7 +534,7 @@ class NetworkTrainer(object):
         dataRAW = data_dictRAW['data']
         targetRAW = data_dictRAW['target']
 
-        if random.uniform(0,1) > probBGGetAugment:
+        if probBGGetAugment > random.uniform(0,1):
             # do both augmentation
             data = data
             target = target
