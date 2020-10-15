@@ -53,60 +53,54 @@ class mCrossentropyND(nn.Module):
 
         ################################### Symmetric/ asymmetric large margin loss ###################################
 
+        '''
+        I should get the input to softmax to get q, with the shape [N,C]
+        '''
         if self.asy == 0:
             # have margin on all classes.
-            inpmargin = torch.stack((inp[:, 0] - self.margin, inp[:, 1] - self.margin, inp[:, 2] - self.margin), 1)
-            # preserve the other sums
-            inppost = torch.stack((inp[:, 0] * (target != 0).float() + inpmargin[:, 0] * (target == 0).float(),
-                                   inp[:, 1] * (target != 1).float() + inpmargin[:, 1] * (target == 1).float(),
-                                   inp[:, 2] * (target != 2).float() + inpmargin[:, 2] * (target == 2).float()), 1)
+            r = [1, 1, 1]
         if self.asy == 1:
             # have margin only on foreground class
-            inpmargin = torch.stack((inp[:, 0], inp[:, 1] - self.margin, inp[:, 2] - self.margin), 1)
-            # preserve the other sums
-            inppost = torch.stack((inp[:, 0] * (target != 0).float() + inpmargin[:, 0] * (target == 0).float(),
-                                   inp[:, 1] * (target != 1).float() + inpmargin[:, 1] * (target == 1).float(),
-                                   inp[:, 2] * (target != 2).float() + inpmargin[:, 2] * (target == 2).float()), 1)
+            r = [0, 1, 1]
         if self.asy == 2:
             # have margin only on the tumor class
-            inpmargin = torch.stack((inp[:, 0], inp[:, 1], inp[:, 2] - self.margin), 1)
-            # preserve the other sums
-            inppost = torch.stack((inp[:, 0] * (target != 0).float() + inpmargin[:, 0] * (target == 0).float(),
-                                 inp[:, 1] * (target != 1).float() + inpmargin[:, 1] * (target == 1).float(),
-                                 inp[:, 2] * (target != 2).float() + inpmargin[:, 2] * (target == 2).float()), 1)
+            r = [0, 0, 1]
 
-        p_y_given_x_train = torch.softmax(inppost, 1)
-        e1 = 1e-6 ## without the small margin, it would lead to nan after several epochs
-        log_p_y_given_x_train = (p_y_given_x_train + e1).log()
+        # extend r from [1,C] to [N,C]
+        r = torch.reshape(torch.tensor(r), [1, len(r)])
+        rRepeat = torch.cat(log_p_y_given_x_train.shape[0] * [r])
+        # this is the input to softmax, which will give us q
+        inppost = inp - rRepeat * y_one_hot * self.margin
 
         #########################################################################################################
 
-        ################################### Symmetric/ asymmetric focal loss ###################################
+        p_y_given_x_train = torch.softmax(inppost, 1)
+        e1 = 1e-6  ## without the small margin, it would lead to nan after several epochs
+        log_p_y_given_x_train = (p_y_given_x_train + e1).log()
 
-        focal_conduct_active1 = (1 - p_y_given_x_train + e1) ** self.gama
-        focal_conduct_active2 = (p_y_given_x_train + e1) ** self.gama
+        ################################### Symmetric/ asymmetric focal loss ###################################
 
         if self.asy == 0:
             # have focal reduction on all classes.
-            focal_conduct1 = focal_conduct_active1
-            focal_conduct2 = focal_conduct_active2
+            r = [1, 1, 1]
         if self.asy == 1:
             # have focal reduction only on 0 class
-            conduct_ones = torch.ones(p_y_given_x_train.size()[0], 2)
-            conduct_ones = conduct_ones.cuda()
-            focal_conduct1 = torch.cat((focal_conduct_active1[:, 0:1], conduct_ones), 1)
-            focal_conduct2 = torch.cat((focal_conduct_active2[:, 0:1], conduct_ones), 1)
+            r = [0, 1, 1]
         if self.asy == 2:
             # have focal reduction only on 0 and 1 class
-            conduct_ones = torch.ones(p_y_given_x_train.size()[0], 1)
-            conduct_ones = conduct_ones.cuda()
-            focal_conduct1 = torch.cat((focal_conduct_active1[:, 0:2], conduct_ones), 1)
-            focal_conduct2 = torch.cat((focal_conduct_active2[:, 0:2], conduct_ones), 1)
+            r = [0, 0, 1]
 
-        m_log_p_y_given_x_train = focal_conduct1 * log_p_y_given_x_train
+        # extend r from [1,C] to [N,C]
+        r = torch.reshape(torch.tensor(r), [1, len(r)])
+        rRepeat = torch.cat(log_p_y_given_x_train.shape[0] * [r])
 
-        # if do not facny a hinge.
-        focal_conduct = focal_conduct1.clone()
+        focal_conduct_active = (1 - p_y_given_x_train + e1) ** self.gama
+        focal_conduct_inactive = torch.ones(p_y_given_x_train.size())
+
+        focal_conduct = focal_conduct_active * (1-rRepeat) + focal_conduct_inactive * rRepeat
+        m_log_p_y_given_x_train = focal_conduct * log_p_y_given_x_train
+
+        # I also need to pass the focal_conduct to the DSC loss, which is calculated outside
 
         #########################################################################################################
 
@@ -114,9 +108,7 @@ class mCrossentropyND(nn.Module):
 
         loss = - (1. / num_samples) * m_log_p_y_given_x_train * y_one_hot
 
-        # print(loss.sum())
-        # print(F.cross_entropy(inp, target)) # correct and original one
-        return loss.sum(), inppost, focal_conduct, focal_conduct2
+        return loss.sum(), inppost, focal_conduct
 
 
     def one_hot_embedding(self, labels, num_classes):

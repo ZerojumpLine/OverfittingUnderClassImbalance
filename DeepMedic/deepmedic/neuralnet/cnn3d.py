@@ -601,10 +601,21 @@ class Cnn3d(object):
 
         x_entrall = log_p_y_given_x_train * y_one_hot
 
-        if self.nside == 1:  # only for the tumour samples
-            x_entr = - (1. / num_samples) * tf.reduce_sum(x_entrall[:, 1, :, :, :])
-        if self.nside == 2:  # for both tumour and backgr samples
-            x_entr = - (1. / num_samples) * tf.reduce_sum(x_entrall)
+        if self.nside == 1:
+            # only the tumour class is taken as rare class
+            r = [0, 1]
+            # this is my naive implementation
+            # x_entr = - (1. / num_samples) * tf.reduce_sum(x_entrall[:, 1, :, :, :])
+        if self.nside == 2:
+            # both classes are taken as rare classes
+            r = [1, 1]
+            # this is my naive implementation
+            # x_entr = - (1. / num_samples) * tf.reduce_sum(x_entrall)
+
+        r = tf.constant(r, shape=[1, len(r)], dtype=tf.float32)
+        x_entrall = tf.transpose(x_entrall, perm=[1, 0, 2, 3, 4])
+        x_entrall = tf.reshape(x_entrall, shape=[x_entrall.shape[0], -1])
+        x_entr = - (1. / num_samples) * tf.reduce_sum(tf.matmul(r, x_entrall))
 
         ## this part borrowed from tf_vat
         [grad1, grad2, grad3] = tf.gradients(x_entr,

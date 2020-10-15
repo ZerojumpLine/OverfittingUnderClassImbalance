@@ -43,7 +43,7 @@ class advCrossentropyND(nn.Module):
         # now inp is [N,C], target is [N,]
 
         y_one_hot = self.one_hot_embedding(target.data.cpu(), num_classes)
-        y_one_hot = y_one_hot.cuda()
+        y_one_hot = y_one_hot.cuda() # [N, C]
         # p_y_given_x_train is corresponding [N,C]
 
         p_y_given_x_train = torch.softmax(inp, 1)
@@ -51,30 +51,31 @@ class advCrossentropyND(nn.Module):
         log_p_y_given_x_train = (p_y_given_x_train + e1).log()
 
         ################################### Symmetric/ asymmetric adversarial training ###################################
-        # find the directio
+        '''
+        Find the adversarial direction
+        '''
 
         if self.asy == 0:
             # have adversarial training on all classes.
-            y_one_hot = y_one_hot
-            ydsclosspositionc0 = (y_one_hot[:, 0] > 0)
-            ydsclosspositionc1 = (y_one_hot[:, 1] > 0)
-            ydsclosspositionc2 = (y_one_hot[:, 2] > 0)
-            ydsclossposition = ydsclosspositionc0 + ydsclosspositionc1 + ydsclosspositionc2
+            r = [1, 1, 1]
         if self.asy == 1:
+            r = [0, 1, 1]
             # have adversarial training only on foreground
-            conduct_zeros = torch.zeros(p_y_given_x_train.size()[0], 1)
-            conduct_zeros = conduct_zeros.cuda()
-            y_one_hot = torch.cat((conduct_zeros, y_one_hot[:, 1:3]), 1)
-            ydsclosspositionc1 = (y_one_hot[:, 1] > 0)
-            ydsclosspositionc2 = (y_one_hot[:, 2] > 0)
-            ydsclossposition = ydsclosspositionc1 + ydsclosspositionc2
         if self.asy == 2:
+            r = [0, 0, 1]
             # have adversarial training only on tumor
-            conduct_zeros = torch.zeros(p_y_given_x_train.size()[0], 2)
-            conduct_zeros = conduct_zeros.cuda()
-            y_one_hot = torch.cat((conduct_zeros, y_one_hot[:, 2:3]), 1)
-            ydsclosspositionc2 = (y_one_hot[:, 2] > 0)
-            ydsclossposition = ydsclosspositionc2
+
+        '''
+        I need to get two things from here:
+        1. y_one_hot, which is [N,C], but only contains cls where r==1
+        2. ydsclossposition, which is [N,], containing where r==1
+        '''
+        # extend r from [1,C] to [N,C]
+        r = torch.reshape(torch.tensor(r), [1, len(r)])
+        rRepeat = torch.cat(log_p_y_given_x_train.shape[0]*[r])
+        y_one_hot = y_one_hot * rRepeat
+
+        ydsclossposition = torch.sum(y_one_hot, dim=1) > 0
 
         #########################################################################################################
 
@@ -83,7 +84,7 @@ class advCrossentropyND(nn.Module):
         loss = - (1. / num_samples) * log_p_y_given_x_train * y_one_hot
 
         # print(loss.sum())
-        # print(F.cross_entropy(inp, target)) # correct and original one
+        # print(F.cross_entropy(inp, target)) # consistent with the original one
         return loss.sum(), y_one_hot, ydsclossposition
 
 

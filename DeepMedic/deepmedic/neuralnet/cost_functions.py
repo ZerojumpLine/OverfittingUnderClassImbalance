@@ -6,7 +6,7 @@
 # or read the terms at https://opensource.org/licenses/BSD-3-Clause.
 
 from __future__ import absolute_import, print_function, division
-
+import numpy as np
 import tensorflow as tf
 
 
@@ -54,69 +54,46 @@ def dsc(p_y_given_x_train, y_gt, eps=1e-5):
     cost = 1. - av_class_dsc
     return cost
 
-def focaloneside(p_y_given_x_train_network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mixupbiasmargin, marginm, mixuplambda, eps=1e-6 ):
-    # p_y_given_x_train : tensor5 [batchSize, classes, r, c, z]
+def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mixupbiasmargin, marginm, mixuplambda, eps=1e-6 ):
+    # p_y_given_x_train_network_output : tensor5 [batchSize, classes, r, c, z]
     # y: T.itensor4('y'). Dimensions [batchSize, r, c, z]
     # weightPerClass is a vector with 1 element per class.
 
     '''
     Watchout, p_y_given_x_train_network_output does not have non linear, we do softmax here.
     It now only supports binary class segmentation (brats/ ATLAS)
-    However, it should not be difficult to extend, but needs good designs...
+    However, it should not be difficult to extend.
     '''
 
-    ########################################### margin part #################################################
     '''
-    needed hyperparamter: marginm
+    tips, if you want to extend the code to your application, you can just define your /boldsymbol{r}
     '''
-
-    inputToSoftmaxReshaped = tf.transpose(p_y_given_x_train_network_output, perm=[0, 2, 3, 4, 1])
-    inputToSoftmaxFlattened = tf.reshape(inputToSoftmaxReshaped, shape=[-1])
-    numberOfVoxelsDenselyClassified = p_y_given_x_train_network_output.shape[2] * p_y_given_x_train_network_output.shape[3] * p_y_given_x_train_network_output.shape[4]
-    firstDimOfInputToSoftmax2d = p_y_given_x_train_network_output.shape[0] * numberOfVoxelsDenselyClassified  # b
-    inputToSoftmax2d = tf.reshape(inputToSoftmaxFlattened, shape=[firstDimOfInputToSoftmax2d, p_y_given_x_train_network_output.shape[1]])  # Res
-
-    inputToSoftmax2dt = tf.stack([inputToSoftmax2d[:, 0], inputToSoftmax2d[:, 1] - abs(marginm)])  # it is only for tumour
-    inputToSoftmax2dt = tf.transpose(inputToSoftmax2dt, [1, 0])
-
-    if marginm < 0:  # do it in both sides, it is for backgr
-        inputToSoftmax2db = tf.stack([inputToSoftmax2d[:, 0] - abs(marginm), inputToSoftmax2d[:, 1]])  # it is only for backgr
-        inputToSoftmax2db = tf.transpose(inputToSoftmax2db, [1, 0])
-    else:
-        inputToSoftmax2db = inputToSoftmax2d
-
-    y_gt_flattened_tumour = tf.cast(tf.reshape(y_gtmixp0, shape=[-1]), tf.float32)  # 1 is for tumour
-    y_gt_flattened_backgr = 1 - y_gt_flattened_tumour
-
-    inputToSoftmax2dpost = tf.stack([inputToSoftmax2db[:, 0] * y_gt_flattened_backgr + inputToSoftmax2dt[:, 0] * y_gt_flattened_tumour,
-                                     inputToSoftmax2db[:, 1] * y_gt_flattened_backgr + inputToSoftmax2dt[:, 1] * y_gt_flattened_tumour])
-    inputToSoftmax2dpost = tf.transpose(inputToSoftmax2dpost, [1, 0])
-
-    p_y_given_x_2d = tf.nn.softmax(inputToSoftmax2dpost, axis=-1)
-    p_y_given_x_classMinor = tf.reshape(p_y_given_x_2d, shape=[p_y_given_x_train_network_output.shape[0], p_y_given_x_train_network_output.shape[2], p_y_given_x_train_network_output.shape[3],
-                                                               p_y_given_x_train_network_output.shape[4], p_y_given_x_train_network_output.shape[1]])  # Result: batchSize, R,C,Z, Classes.
-    p_y_given_x_train = tf.transpose(p_y_given_x_classMinor, perm=[0, 4, 1, 2, 3])  # Result: batchSize, Class, R, C, Z
-
-    ########################################################################################################
-
-    log_p_y_given_x_train = tf.log(p_y_given_x_train + eps)
 
     ################################################ mixup part ################################################
     '''
-    needed hyperparameter: mixupbiasmargin, mixuplambda
+    needed hyperparameters: mixupbiasmargin, mixuplambda
     '''
-    y_gtmix = y_gtmixp0 + y_gtmixp1
-    y_gtmix_bool = tf.cast(y_gtmix, tf.bool)
 
     if mixupbiasmargin > 0: # asymmetric mixup
+
+        r = [0, 1]
+        rall = [i for i, e in enumerate(r) if e == 1]
+        y_comb0 = y_gtmixp0
+        y_comb1 = y_gtmixp1
+        # if the other one is taken as one of the rare classes, the combination should change
+        for rindex in range(len(rall)):
+            rindex = tf.constant(rindex)
+            y_comb0 = tf.cond(tf.equal(y_gtmixp1, rindex), lambda: y_gtmixp1, lambda:y_comb0)
+            y_comb1 = tf.cond(tf.equal(y_gtmixp0, rindex), lambda: y_gtmixp0, lambda:y_comb1)
+
         lambdathreshold = tf.constant(1-mixupbiasmargin, dtype=tf.float32)
 
-        y_gtmix0 = tf.cond(tf.less(mixuplambda, lambdathreshold), lambda: tf.cast(y_gtmix_bool, tf.int32), lambda: y_gtmixp0)
-        y_gtmix1 = tf.cond(tf.less(1 - mixuplambda, lambdathreshold), lambda: tf.cast(y_gtmix_bool, tf.int32), lambda: y_gtmixp1)
+        y_gtmix0 = tf.cond(tf.less(mixuplambda, lambdathreshold), lambda: y_comb0, lambda: y_gtmixp0)
+        y_gtmix1 = tf.cond(tf.less(1 - mixuplambda, lambdathreshold), lambda: y_comb1, lambda: y_gtmixp1)
 
         ## combine the two loss
-        y_one_hot_mix0 = tf.one_hot(indices=y_gtmix0, depth=tf.shape(p_y_given_x_train)[1], axis=1, dtype="float32") * tf.cast(abs(mixuplambda), tf.float32)
-        y_one_hot_mix1 = tf.one_hot(indices=y_gtmix1, depth=tf.shape(p_y_given_x_train)[1], axis=1, dtype="float32") * tf.cast((1 - abs(mixuplambda)), tf.float32)
+        y_one_hot_mix0 = tf.one_hot(indices=y_gtmix0, depth=tf.shape(network_output)[1], axis=1, dtype="float32") * tf.cast(abs(mixuplambda), tf.float32)
+        y_one_hot_mix1 = tf.one_hot(indices=y_gtmix1, depth=tf.shape(network_output)[1], axis=1, dtype="float32") * tf.cast((1 - abs(mixuplambda)), tf.float32)
         y_one_hot_mixpre = y_one_hot_mix0 + y_one_hot_mix1
 
         # if the sample is generated by mixup, I do not want middle results, such as "0.3 tumor"
@@ -124,11 +101,56 @@ def focaloneside(p_y_given_x_train_network_output, y_gtmixp0, y_gtmixp1, gama, w
     else: # traditional mixup, just mix the one-hot label
         y_gtmix0 = y_gtmixp0
         y_gtmix1 = y_gtmixp1
-        y_one_hot_mix0 = tf.one_hot(indices=y_gtmix0, depth=tf.shape(p_y_given_x_train)[1], axis=1, dtype="float32") * tf.cast(abs(mixuplambda), tf.float32)
-        y_one_hot_mix1 = tf.one_hot(indices=y_gtmix1, depth=tf.shape(p_y_given_x_train)[1], axis=1, dtype="float32") * tf.cast((1 - abs(mixuplambda)), tf.float32)
-        y_one_hot_mix = y_one_hot_mix0 + y_one_hot_mix1
+        y_one_hot_mix0 = tf.one_hot(indices=y_gtmix0, depth=tf.shape(network_output)[1], axis=1, dtype="float32") * tf.cast(abs(mixuplambda), tf.float32)
+        y_one_hot_mix1 = tf.one_hot(indices=y_gtmix1, depth=tf.shape(network_output)[1], axis=1, dtype="float32") * tf.cast((1 - abs(mixuplambda)), tf.float32)
+        y_one_hot_mix = y_one_hot_mix0 + y_one_hot_mix1 # [batchSize, classes, r, c, z]
 
     ########################################################################################################
+
+    # this is taken from the network code, to get the input to softmax
+    inputToSoftmaxReshaped = tf.transpose(p_y_given_x_train_network_output, perm=[0, 2, 3, 4, 1])
+    inputToSoftmaxFlattened = tf.reshape(inputToSoftmaxReshaped, shape=[-1])
+    numberOfVoxelsDenselyClassified = p_y_given_x_train_network_output.shape[2] * \
+                                      p_y_given_x_train_network_output.shape[3] * \
+                                      p_y_given_x_train_network_output.shape[4]
+    firstDimOfInputToSoftmax2d = p_y_given_x_train_network_output.shape[
+                                     0] * numberOfVoxelsDenselyClassified  # batchSize*r*c*z.
+    inputToSoftmax2d = tf.reshape(inputToSoftmaxFlattened, shape=[firstDimOfInputToSoftmax2d,
+                                                                  p_y_given_x_train_network_output.shape[
+                                                                      1]])  # N * cls
+
+    ########################################### margin part #################################################
+    '''
+    needed hyperparamter: marginm
+    '''
+
+    if marginm < 0: # do it in both classes
+        r = [1, 1]
+    else: # only for cls 1
+        r = [0, 1]
+    r = tf.constant(r, shape=[1, len(r)], dtype=tf.float32)
+    y_one_hot_mixReshaped = tf.transpose(y_one_hot_mix, perm=[0, 2, 3, 4, 1])
+    y_one_hot_mixFlattened = tf.reshape(y_one_hot_mixReshaped, shape=[firstDimOfInputToSoftmax2d,
+                                                              p_y_given_x_train_network_output.shape[1]]) # N * cls
+    y_one_hot_mixFlattened_M = y_one_hot_mixFlattened * abs(marginm)
+    # multiply by the r
+    # extent r from 1 * cls to N * cls
+    rRepeat = tf.tile(r, [firstDimOfInputToSoftmax2d,1])
+    # this is \hat{q}
+    inputToSoftmax2d_M = inputToSoftmax2d - y_one_hot_mixFlattened_M * rRepeat
+
+    ########################################################################################################
+
+    p_y_given_x_2d = tf.nn.softmax(inputToSoftmax2d_M, axis=-1)
+    p_y_given_x_classMinor = tf.reshape(p_y_given_x_2d, shape=[p_y_given_x_train_network_output.shape[0],
+                                                               p_y_given_x_train_network_output.shape[2],
+                                                               p_y_given_x_train_network_output.shape[3],
+                                                               p_y_given_x_train_network_output.shape[4],
+                                                               p_y_given_x_train_network_output.shape[
+                                                                   1]])  # Result: batchSize, R,C,Z, Classes.
+    p_y_given_x_train = tf.transpose(p_y_given_x_classMinor,
+                                     perm=[0, 4, 1, 2, 3])  # Result: batchSize, Class, R, C, Z
+    log_p_y_given_x_train = tf.log(p_y_given_x_train + eps)
 
     ####################################  focal loss part  ########################################################
     '''
@@ -136,11 +158,19 @@ def focaloneside(p_y_given_x_train_network_output, y_gtmixp0, y_gtmixp1, gama, w
     '''
 
     if gama < 0: # do it only for the background cls
-        focal_conduct_active = (1 - p_y_given_x_train + eps) ** abs(gama)
-        a = tf.ones([focal_conduct_active.shape[0], 1, focal_conduct_active.shape[2], focal_conduct_active.shape[3], focal_conduct_active.shape[4]])
-        focal_conduct = tf.concat([focal_conduct_active[:, 0:1, :, :, :], a], 1)
+        r = [0, 1]
     else: # normal focal loss
-        focal_conduct = (1 - p_y_given_x_train) ** abs(gama)
+        r = [1, 1]
+    r = tf.constant(r, shape=[1, len(r), 1, 1, 1], dtype=tf.float32)
+    # fill the shape
+    rRepeat = tf.tile(r, [p_y_given_x_train.shape[0], p_y_given_x_train.shape[1], p_y_given_x_train.shape[2], p_y_given_x_train.shape[3],
+                 p_y_given_x_train.shape[4]])
+
+    focal_conduct_active = (1 - p_y_given_x_train + eps) ** abs(gama)
+    focal_conduct_inactive = tf.ones([focal_conduct_active.shape[0], focal_conduct_active.shape[1], focal_conduct_active.shape[2], focal_conduct_active.shape[3],
+                 focal_conduct_active.shape[4]])
+
+    focal_conduct = focal_conduct_active * (1-rRepeat) + focal_conduct_inactive * rRepeat
     m_log_p_y_given_x_train = focal_conduct * log_p_y_given_x_train
     weightPerClass5D = tf.reshape(weightPerClass, shape=[1, tf.shape(p_y_given_x_train)[1], 1, 1, 1])
     weighted_log_p_y_given_x_train = m_log_p_y_given_x_train * weightPerClass5D

@@ -578,6 +578,7 @@ class NetworkTrainer(object):
             data_dictasy = data_dictRAW
         else:
             data_dictasy = data_dict
+        ## maybe here I want to use the image w/o augmentation for adv/ mixup, to be more stable.
         dataasy = data_dictasy['data']
         targetasy = data_dictasy['target']
 

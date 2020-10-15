@@ -113,7 +113,7 @@ class SoftDiceLoss(nn.Module):
 
         return -dc
 
-def mget_tp_fp_fn(net_output, gt, focal_conduct1, focal_conduct2, axes=None, mask=None, square=False):
+def mget_tp_fp_fn(net_output, gt, focal_conduct, axes=None, mask=None, square=False):
     """
     net_output must be (b, c, x, y(, z)))
     gt must be a label map (shape (b, 1, x, y(, z)) OR shape (b, x, y(, z))) or one hot encoding (b, c, x, y(, z))
@@ -148,23 +148,17 @@ def mget_tp_fp_fn(net_output, gt, focal_conduct1, focal_conduct2, axes=None, mas
     # here is a little dummy...for simplicity, focal_conduct is [N,C]
     # y_onehot is [B, C, H, W, D]
     # first reshape [N,C] to [B, H, W, D, C]
-    focal_conduct1 = torch.reshape(focal_conduct1, (net_output.shape[0], net_output.shape[2], net_output.shape[3], net_output.shape[4], net_output.shape[1]))
+    focal_conduct = torch.reshape(focal_conduct, (net_output.shape[0], net_output.shape[2], net_output.shape[3], net_output.shape[4], net_output.shape[1]))
     # then use transpose [B, H, W, D, C] to [B, C, H, W, D]
-    focal_conduct1 = focal_conduct1.transpose(4, 3)
-    focal_conduct1 = focal_conduct1.transpose(3, 2)
-    focal_conduct1 = focal_conduct1.transpose(2, 1)
-    # first reshape [N,C] to [B, H, W, D, C]
-    focal_conduct2 = torch.reshape(focal_conduct2, (net_output.shape[0], net_output.shape[2], net_output.shape[3], net_output.shape[4], net_output.shape[1]))
-    # then use transpose [B, H, W, D, C] to [B, C, H, W, D]
-    focal_conduct2 = focal_conduct2.transpose(4, 3)
-    focal_conduct2 = focal_conduct2.transpose(3, 2)
-    focal_conduct2 = focal_conduct2.transpose(2, 1)
+    focal_conduct = focal_conduct.transpose(4, 3)
+    focal_conduct = focal_conduct.transpose(3, 2)
+    focal_conduct = focal_conduct.transpose(2, 1)
 
-    # this is like focla Tversky loss, but it would suppress too much
+    # this is like focal Tversky loss, but it would suppress too much
     # focal_fp = net_output * (1 - y_onehot) * focal_conduct2
 
     focal_fp = net_output * (1 - y_onehot)
-    focal_fn = (1 - net_output) * y_onehot * focal_conduct1
+    focal_fn = (1 - net_output) * y_onehot * focal_conduct
     tp = net_output * y_onehot
     fp = net_output * (1 - y_onehot)
     fn = (1 - net_output) * y_onehot
@@ -206,7 +200,7 @@ class mSoftDiceLoss(nn.Module):
         self.apply_nonlin = apply_nonlin
         self.smooth = smooth
 
-    def forward(self, x, y, focal_conduct1, focal_conduct2, loss_mask=None):
+    def forward(self, x, y, focal_conduct, loss_mask=None):
         shp_x = x.shape
 
         if self.batch_dice:
@@ -217,7 +211,7 @@ class mSoftDiceLoss(nn.Module):
         if self.apply_nonlin is not None:
             x = self.apply_nonlin(x)
 
-        focal_fp, focal_fn, tp, fp, fn = mget_tp_fp_fn(x, y, focal_conduct1, focal_conduct2, axes, loss_mask, self.square)
+        focal_fp, focal_fn, tp, fp, fn = mget_tp_fp_fn(x, y, focal_conduct, axes, loss_mask, self.square)
 
         dc = (focal_fp + focal_fn + self.smooth) / (2 * tp + fp + fn + self.smooth)
 
@@ -275,13 +269,13 @@ class mCE_loss(nn.Module):
         self.dc = mSoftDiceLoss(apply_nonlin=softmax_helper, **soft_dice_kwargs)
 
     def forward(self, net_output, target):
-        ce_loss, inpost, focal_conduct1, focal_conduct2 = self.ce(net_output, target)
+        ce_loss, inpost, focal_conduct = self.ce(net_output, target)
         inpost = torch.reshape(inpost, (net_output.shape[0], net_output.shape[2], net_output.shape[3], net_output.shape[4], net_output.shape[1]))
         # then use transpose [B, H, W, D, C] to [B, C, H, W, D]
         inpost = inpost.transpose(4, 3)
         inpost = inpost.transpose(3, 2)
         inpost = inpost.transpose(2, 1)
-        dc_loss = self.dc(inpost, target, focal_conduct1, focal_conduct2)
+        dc_loss = self.dc(inpost, target, focal_conduct)
         results = ce_loss + dc_loss
         return results
 
@@ -292,7 +286,7 @@ class mixCE_loss(nn.Module):
         self.dc = mSoftDiceLoss(apply_nonlin=softmax_helper, **soft_dice_kwargs)
 
     def forward(self, net_output, target, lam):
-        ce_loss, y_one_hotmixup, ydsclossposition, inpost, focal_conduct1, focal_conduct2 = self.ce(net_output, target, lam)
+        ce_loss, y_one_hotmixup, ydsclossposition, inpost, focal_conduct = self.ce(net_output, target, lam)
         y_one_hotmixup = torch.reshape(y_one_hotmixup, (net_output.shape[0], net_output.shape[2], net_output.shape[3], net_output.shape[4], net_output.shape[1]))
         # then use transpose [B, H, W, D, C] to [B, C, H, W, D]
         y_one_hotmixup = y_one_hotmixup.transpose(4, 3)
@@ -308,7 +302,7 @@ class mixCE_loss(nn.Module):
         inpost = inpost.transpose(4, 3)
         inpost = inpost.transpose(3, 2)
         inpost = inpost.transpose(2, 1)
-        dc_loss = self.dc(inpost, y_one_hotmixup, focal_conduct1, focal_conduct2, loss_mask = ydsclossposition)
+        dc_loss = self.dc(inpost, y_one_hotmixup, focal_conduct, loss_mask = ydsclossposition)
         result = ce_loss + dc_loss
         return result
 

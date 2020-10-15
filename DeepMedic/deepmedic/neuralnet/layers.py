@@ -450,7 +450,7 @@ class SoftmaxLayer(TargetLayer):
         ( self.p_y_given_x_test,
         self.y_pred_test ) = applySoftmaxToFmAndReturnProbYandPredY( biasedInputToSoftmaxTest, self.inputShape["test"], self._numberOfOutputClasses, softmaxTemperature)
 
-        self.p_y_given_x_train_network_output = biasedInputToSoftmaxTrain
+        self.network_output = biasedInputToSoftmaxTrain
 
         self._setBlocksOutputAttributes(self.p_y_given_x_train, self.p_y_given_x_val, self.p_y_given_x_test, self.inputShape["train"], self.inputShape["val"], self.inputShape["test"])
         
