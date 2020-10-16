@@ -81,7 +81,7 @@ def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mix
         y_comb0 = y_gtmixp0
         y_comb1 = y_gtmixp1
         # if the other one is taken as one of the rare classes, the combination should change
-        for rindex in range(len(rall)):
+        for rindex in rall:
             rindextf = tf.constant(rindex)
             y_comb0 = tf.where(tf.equal(y_gtmixp1, rindextf), x = y_gtmixp1, y = y_comb0)
             y_comb1 = tf.where(tf.equal(y_gtmixp0, rindextf), x = y_gtmixp0, y = y_comb1)
@@ -119,7 +119,7 @@ def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mix
                                                                   network_output.shape[
                                                                       1]])  # N * cls
 
-    ########################################### margin part #################################################
+    ########################################### large margin part #################################################
     '''
     needed hyperparamter: marginm
     '''
@@ -136,7 +136,7 @@ def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mix
     # multiply by the r
     # extent r from 1 * cls to N * cls
     rRepeat = tf.tile(r, [firstDimOfInputToSoftmax2d,1])
-    # this is \hat{q}
+    # this is to get \hat{q}
     inputToSoftmax2d_M = inputToSoftmax2d - y_one_hot_mixFlattened_M * rRepeat
 
     ########################################################################################################
@@ -161,7 +161,7 @@ def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mix
     if gama < 0: # do it only for the background cls
         r = [0, 1]
     else: # normal focal loss
-        r = [1, 1]
+        r = [0, 0]
     r = tf.constant(r, shape=[1, len(r), 1, 1, 1], dtype=tf.float32)
     # fill the shape from 1, Class,1, 1, 1 to batchSize, Class, R, C, Z
     rRepeat = tf.tile(r, [p_y_given_x_train.shape[0], 1, p_y_given_x_train.shape[2], p_y_given_x_train.shape[3],

@@ -85,7 +85,7 @@ class mixCrossentropyND(nn.Module):
             y_comb0 = target
             y_comb1 = targetmix
             # if the other one is taken as one of the rare classes, the combination should change
-            for rindex in range(len(rall)):
+            for rindex in rall:
                 y_comb0 = torch.where(targetmix == rindex, targetmix, target)
                 y_comb1 = torch.where(target == rindex, target, targetmix)
 
@@ -133,7 +133,7 @@ class mixCrossentropyND(nn.Module):
         r = torch.reshape(torch.tensor(r), [1, len(r)])
         rRepeat = torch.cat(inp.shape[0] * [r])
         # this is the input to softmax, which will give us q
-        inppost = inp - rRepeat.float().cuda() * y_one_hotmixup * self.margin
+        inppost = inp - rRepeat.float().cuda() * y_one_hotmixup * self.marginm
 
         #########################################################################################################
 
@@ -146,7 +146,7 @@ class mixCrossentropyND(nn.Module):
 
         if self.asy == 0:
             # have focal reduction on all classes.
-            r = [1, 1, 1]
+            r = [0, 0, 0]
         if self.asy == 1:
             # have focal reduction only on 0 class
             r = [0, 1, 1]

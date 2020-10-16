@@ -83,7 +83,7 @@ class mCrossentropyND(nn.Module):
 
         if self.asy == 0:
             # have focal reduction on all classes.
-            r = [1, 1, 1]
+            r = [0, 0, 0]
         if self.asy == 1:
             # have focal reduction only on 0 class
             r = [0, 1, 1]
