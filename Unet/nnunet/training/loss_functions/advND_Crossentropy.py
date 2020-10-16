@@ -73,7 +73,7 @@ class advCrossentropyND(nn.Module):
         # extend r from [1,C] to [N,C]
         r = torch.reshape(torch.tensor(r), [1, len(r)])
         rRepeat = torch.cat(log_p_y_given_x_train.shape[0]*[r])
-        y_one_hot = y_one_hot * rRepeat
+        y_one_hot = y_one_hot * rRepeat.float().cuda()
 
         ydsclossposition = torch.sum(y_one_hot, dim=1) > 0
 

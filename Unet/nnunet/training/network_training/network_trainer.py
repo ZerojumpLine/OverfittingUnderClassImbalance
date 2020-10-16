@@ -612,6 +612,7 @@ class NetworkTrainer(object):
             lam = np.random.beta(self.alpha, self.alpha) * (1- self.margin)
             # just emphasize the effect by collecting more middle regions
             datamix = dataasy.flip(0)
+            # just flip the sample in the batch to be the sample to be mixed
             datamixup = lam * dataasy + (1. - lam) * datamix
             # del dataasy
             self.optimizer.zero_grad()

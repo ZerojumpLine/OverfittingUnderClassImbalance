@@ -68,12 +68,13 @@ class mCrossentropyND(nn.Module):
 
         # extend r from [1,C] to [N,C]
         r = torch.reshape(torch.tensor(r), [1, len(r)])
-        rRepeat = torch.cat(log_p_y_given_x_train.shape[0] * [r])
+        rRepeat = torch.cat(inp.shape[0] * [r])
         # this is the input to softmax, which will give us q
-        inppost = inp - rRepeat * y_one_hot * self.margin
+        inppost = inp - rRepeat.float().cuda() * y_one_hot * self.margin
 
         #########################################################################################################
 
+        # do the softmax and get q
         p_y_given_x_train = torch.softmax(inppost, 1)
         e1 = 1e-6  ## without the small margin, it would lead to nan after several epochs
         log_p_y_given_x_train = (p_y_given_x_train + e1).log()
@@ -97,7 +98,7 @@ class mCrossentropyND(nn.Module):
         focal_conduct_active = (1 - p_y_given_x_train + e1) ** self.gama
         focal_conduct_inactive = torch.ones(p_y_given_x_train.size())
 
-        focal_conduct = focal_conduct_active * (1-rRepeat) + focal_conduct_inactive * rRepeat
+        focal_conduct = focal_conduct_active * (1-rRepeat.float().cuda()) + focal_conduct_inactive.cuda() * rRepeat.float().cuda()
         m_log_p_y_given_x_train = focal_conduct * log_p_y_given_x_train
 
         # I also need to pass the focal_conduct to the DSC loss, which is calculated outside
@@ -107,7 +108,7 @@ class mCrossentropyND(nn.Module):
         num_samples = m_log_p_y_given_x_train.size()[0]
 
         loss = - (1. / num_samples) * m_log_p_y_given_x_train * y_one_hot
-
+        # print(loss.sum())
         return loss.sum(), inppost, focal_conduct
 
 

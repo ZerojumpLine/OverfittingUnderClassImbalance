@@ -68,7 +68,7 @@ if __name__ == "__main__":
     parser.add_argument('--marginm', type=float, default=1, help='the hyperparameter for large margin loss, margin')
     parser.add_argument('--gama', type=float, default=4, help='the hyperparameter for focal loss, gama')
     parser.add_argument('--alpha', type=float, default=0.2, help='the hyperparameter for beta distribution, alpha')
-    parser.add_argument('--margin', type=float, default=0.8, help='the hyperparameter for asymmetric mixup, margin')
+    parser.add_argument('--margin', type=float, default=0.2, help='the hyperparameter for asymmetric mixup, margin')
     parser.add_argument('--weights', type=int, default=1, help='the weights for the tumor class')
     parser.add_argument("--wo_innerclass", help="mixup does not include in", action="store_true")
     parser.add_argument('--probBGGetAugment', type=float, default=1, help='the probabiltiy of background samples get augmented')

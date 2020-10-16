@@ -55,12 +55,12 @@ def dsc(p_y_given_x_train, y_gt, eps=1e-5):
     return cost
 
 def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mixupbiasmargin, marginm, mixuplambda, eps=1e-6 ):
-    # p_y_given_x_train_network_output : tensor5 [batchSize, classes, r, c, z]
+    # network_output : tensor5 [batchSize, classes, r, c, z]
     # y: T.itensor4('y'). Dimensions [batchSize, r, c, z]
     # weightPerClass is a vector with 1 element per class.
 
     '''
-    Watchout, p_y_given_x_train_network_output does not have non linear, we do softmax here.
+    Watchout, network_output does not have non linear, we do softmax here.
     It now only supports binary class segmentation (brats/ ATLAS)
     However, it should not be difficult to extend.
     '''
@@ -82,9 +82,9 @@ def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mix
         y_comb1 = y_gtmixp1
         # if the other one is taken as one of the rare classes, the combination should change
         for rindex in range(len(rall)):
-            rindex = tf.constant(rindex)
-            y_comb0 = tf.cond(tf.equal(y_gtmixp1, rindex), lambda: y_gtmixp1, lambda:y_comb0)
-            y_comb1 = tf.cond(tf.equal(y_gtmixp0, rindex), lambda: y_gtmixp0, lambda:y_comb1)
+            rindextf = tf.constant(rindex)
+            y_comb0 = tf.where(tf.equal(y_gtmixp1, rindextf), x = y_gtmixp1, y = y_comb0)
+            y_comb1 = tf.where(tf.equal(y_gtmixp0, rindextf), x = y_gtmixp0, y = y_comb1)
 
         lambdathreshold = tf.constant(1-mixupbiasmargin, dtype=tf.float32)
 
@@ -108,15 +108,15 @@ def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mix
     ########################################################################################################
 
     # this is taken from the network code, to get the input to softmax
-    inputToSoftmaxReshaped = tf.transpose(p_y_given_x_train_network_output, perm=[0, 2, 3, 4, 1])
+    inputToSoftmaxReshaped = tf.transpose(network_output, perm=[0, 2, 3, 4, 1])
     inputToSoftmaxFlattened = tf.reshape(inputToSoftmaxReshaped, shape=[-1])
-    numberOfVoxelsDenselyClassified = p_y_given_x_train_network_output.shape[2] * \
-                                      p_y_given_x_train_network_output.shape[3] * \
-                                      p_y_given_x_train_network_output.shape[4]
-    firstDimOfInputToSoftmax2d = p_y_given_x_train_network_output.shape[
+    numberOfVoxelsDenselyClassified = network_output.shape[2] * \
+                                      network_output.shape[3] * \
+                                      network_output.shape[4]
+    firstDimOfInputToSoftmax2d = network_output.shape[
                                      0] * numberOfVoxelsDenselyClassified  # batchSize*r*c*z.
     inputToSoftmax2d = tf.reshape(inputToSoftmaxFlattened, shape=[firstDimOfInputToSoftmax2d,
-                                                                  p_y_given_x_train_network_output.shape[
+                                                                  network_output.shape[
                                                                       1]])  # N * cls
 
     ########################################### margin part #################################################
@@ -131,7 +131,7 @@ def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mix
     r = tf.constant(r, shape=[1, len(r)], dtype=tf.float32)
     y_one_hot_mixReshaped = tf.transpose(y_one_hot_mix, perm=[0, 2, 3, 4, 1])
     y_one_hot_mixFlattened = tf.reshape(y_one_hot_mixReshaped, shape=[firstDimOfInputToSoftmax2d,
-                                                              p_y_given_x_train_network_output.shape[1]]) # N * cls
+                                                              network_output.shape[1]]) # N * cls
     y_one_hot_mixFlattened_M = y_one_hot_mixFlattened * abs(marginm)
     # multiply by the r
     # extent r from 1 * cls to N * cls
@@ -141,12 +141,13 @@ def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mix
 
     ########################################################################################################
 
+    # do the softmax
     p_y_given_x_2d = tf.nn.softmax(inputToSoftmax2d_M, axis=-1)
-    p_y_given_x_classMinor = tf.reshape(p_y_given_x_2d, shape=[p_y_given_x_train_network_output.shape[0],
-                                                               p_y_given_x_train_network_output.shape[2],
-                                                               p_y_given_x_train_network_output.shape[3],
-                                                               p_y_given_x_train_network_output.shape[4],
-                                                               p_y_given_x_train_network_output.shape[
+    p_y_given_x_classMinor = tf.reshape(p_y_given_x_2d, shape=[network_output.shape[0],
+                                                               network_output.shape[2],
+                                                               network_output.shape[3],
+                                                               network_output.shape[4],
+                                                               network_output.shape[
                                                                    1]])  # Result: batchSize, R,C,Z, Classes.
     p_y_given_x_train = tf.transpose(p_y_given_x_classMinor,
                                      perm=[0, 4, 1, 2, 3])  # Result: batchSize, Class, R, C, Z
@@ -162,8 +163,8 @@ def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mix
     else: # normal focal loss
         r = [1, 1]
     r = tf.constant(r, shape=[1, len(r), 1, 1, 1], dtype=tf.float32)
-    # fill the shape
-    rRepeat = tf.tile(r, [p_y_given_x_train.shape[0], p_y_given_x_train.shape[1], p_y_given_x_train.shape[2], p_y_given_x_train.shape[3],
+    # fill the shape from 1, Class,1, 1, 1 to batchSize, Class, R, C, Z
+    rRepeat = tf.tile(r, [p_y_given_x_train.shape[0], 1, p_y_given_x_train.shape[2], p_y_given_x_train.shape[3],
                  p_y_given_x_train.shape[4]])
 
     focal_conduct_active = (1 - p_y_given_x_train + eps) ** abs(gama)
