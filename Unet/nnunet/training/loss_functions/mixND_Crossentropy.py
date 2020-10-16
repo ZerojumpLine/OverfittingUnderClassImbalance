@@ -86,8 +86,14 @@ class mixCrossentropyND(nn.Module):
             y_comb1 = targetmix
             # if the other one is taken as one of the rare classes, the combination should change
             for rindex in rall:
-                y_comb0 = torch.where(targetmix == rindex, targetmix, target)
-                y_comb1 = torch.where(target == rindex, target, targetmix)
+                y_comb0 = torch.where(targetmix == rindex, targetmix, y_comb0)
+                y_comb1 = torch.where(target == rindex, target, y_comb1)
+
+            # if there are several rare classes, we dont want to mix them
+            # keep the y_comb as original labels, when they are rare classes.
+            for rindex in rall:
+                y_comb0 = torch.where(target == rindex, target, y_comb0)
+                y_comb1 = torch.where(targetmix == rindex, targetmix, y_comb1)
 
             # if the another component mixup lambda is less than the margin, set as tumor
             if lam < self.margin:

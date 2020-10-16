@@ -86,6 +86,13 @@ def focaloneside(network_output, y_gtmixp0, y_gtmixp1, gama, weightPerClass, mix
             y_comb0 = tf.where(tf.equal(y_gtmixp1, rindextf), x = y_gtmixp1, y = y_comb0)
             y_comb1 = tf.where(tf.equal(y_gtmixp0, rindextf), x = y_gtmixp0, y = y_comb1)
 
+        # if there are several rare classes, we dont want to mix them
+        # keep the y_comb as original labels, when they are rare classes.
+        for rindex in rall:
+            rindextf = tf.constant(rindex)
+            y_comb0 = tf.where(tf.equal(y_gtmixp0, rindextf), x=y_gtmixp0, y=y_comb0)
+            y_comb1 = tf.where(tf.equal(y_gtmixp1, rindextf), x=y_gtmixp1, y=y_comb1)
+
         lambdathreshold = tf.constant(1-mixupbiasmargin, dtype=tf.float32)
 
         y_gtmix0 = tf.cond(tf.less(mixuplambda, lambdathreshold), lambda: y_comb0, lambda: y_gtmixp0)
