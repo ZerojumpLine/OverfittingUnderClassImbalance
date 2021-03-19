@@ -20,6 +20,19 @@ This code based on the standardized baselines provided by [DeepMedic](https://gi
 
 ## Citation
 If you find our work has positively influenced your projects, please kindly consider to cite our work:
+
+```
+@article{li2020analyzing,
+  title={Analyzing Overfitting under Class Imbalance in Neural Networks for Image Segmentation},
+  author={Li, Zeju and Kamnitsas, Konstantinos and Glocker, Ben},
+  journal={IEEE Transactions on Medical Imaging},
+  year={2020},
+  publisher={IEEE}
+}
+```
+
+and
+
 ```
 @inproceedings{li2019overfitting,
   title={Overfitting of neural nets under class imbalance: Analysis and improvements for segmentation},
