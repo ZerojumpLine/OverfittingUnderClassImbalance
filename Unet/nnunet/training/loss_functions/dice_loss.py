@@ -259,8 +259,8 @@ class advCE_loss(nn.Module):
         ydsclossposition = ydsclossposition.transpose(2, 1)
         ydsclossposition = ydsclossposition.float().cuda()
         dc_loss = self.dc(net_output, onehotasy, loss_mask = ydsclossposition)
-        restuls = ce_loss + dc_loss
-        return restuls
+        results = ce_loss + dc_loss
+        return results
 
 class mCE_loss(nn.Module):
     def __init__(self, soft_dice_kwargs, ce_kwargs):

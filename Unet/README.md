@@ -24,7 +24,7 @@ pytorch==1.1.0
 Run nnUnet with 10% Kits data with asymmetric focal loss:
 
 ```
-python run/run_training.py 3d_fullres nnUNetTrainer Task01_Kits 3 --ndet --asy 2 --marginm 0 --gama 4 --xi 1e-5 --eps 0 --margin 0 --alpha 1 --probBGGetAugment 1 --raw --gpu 0
+python run/run_training.py 3d_fullres nnUNetTrainer Task01_Kits 3 --ndet --asy 2 --marginm 0 --gama 4 --xi 1e-5 --eps 0 --margin 0 --alpha 0 --probBGGetAugment 1 --raw --gpu 0
 ```
 
 - Parameter "asy": Indicates the version of regularization techniques. 0 stands for symmetric regulalrizations, 1 stands for asymmetric variants aiming at improving both foreground cls, 2 stands for asymmetric variants, aiming at only improving cls 2.
@@ -32,8 +32,8 @@ python run/run_training.py 3d_fullres nnUNetTrainer Task01_Kits 3 --ndet --asy 2
 - Parameter "gama": The hyperparameter for focal loss. 2.0 ~ 6.0 is the reasonbale range.
 - Parameter "xi": The hyperparamter for initial perturbs. 10**(-5) is good. It is not that sensitive
 - Parameter "eps": The hyperparamter for adversarial training indicating the magnitude of adversrial perturbs. 10 is a good choice. Set it to 0 to disable adversarial training.
-- Parameter "margin": The hyperpamrameter for asymmetric mixup, set the margin to remain the background class. Set it to 0 to disable mixup.
-- Parameter "alpha": The hyperpamrameter for the mixup, draw the weights from the beta distribution Beta(mixuprate, mixuprate).
+- Parameter "margin": The hyperpamrameter for asymmetric mixup, set the margin to remain the background class. We should set it as 0 for vanilla mixup.
+- Parameter "alpha": The hyperpamrameter for the mixup, draw the weights from the beta distribution Beta(alpha, alpha). Set it to 0 to disable mixup.
 - Parameter "raw": If the adversairal training / mixup are calculated with the raw image (w/o augmentation). set it as true can be more stable considering that the default augmentation is very strong.
 - Parameter "probBGGetAugment": How much probabiltiy the background cls gets augmented.
 

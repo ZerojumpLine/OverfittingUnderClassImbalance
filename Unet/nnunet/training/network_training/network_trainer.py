@@ -608,8 +608,8 @@ class NetworkTrainer(object):
                 self.optimizer.step()
 
         ## the last step, train using the mixuped results
-        if self.margin > 0:
-            lam = np.random.beta(self.alpha, self.alpha) * (1- self.margin)
+        if self.alpha > 0:
+            lam = np.random.beta(self.alpha, self.alpha) * (1 - self.margin)
             # just emphasize the effect by collecting more middle regions
             datamix = dataasy.flip(0)
             # just flip the sample in the batch to be the sample to be mixed
