@@ -10,7 +10,7 @@ pytorch==1.1.0
 ## Data and preprocssing
 1. Download the data from [KiTS19](https://github.com/neheller/kits19).
 2. (Optional) Resample the datasest to a uniform space with 1.6mm * 1.6mm * 3.2mm
-3. Set your path in `./nnunet/paths.py`. Basically, set *base* as where you save your dataset.
+3. Set your path in `./nnunet/paths.py`. Specifically, set *base* as where you save your dataset and set *network_training_output_dir* as where you want to save your models.
 4. Convert the dataset following nnU-Net's [instructions](https://github.com/MIC-DKFZ/nnUNet/blob/master/documentation/dataset_conversion.md). I name the KiTS dataset as Task01_Kits.
 5. Run the preprocessing with 
     ```
