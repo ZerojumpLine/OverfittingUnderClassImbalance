@@ -19,7 +19,7 @@ This code based on the standardized baselines provided by [DeepMedic](https://gi
 - Both DeepMedic and nnUNet are updated to a newer version by their authors. Integration with the newest version is feasible and maybe will be done in the future if it is needed.
 
 ## Citation
-If you find our work has positively influenced your projects, please kindly consider to cite our work:
+If you find our work has positively influenced your projects, please kindly consider citing our work:
 
 ```
 @article{li2020analyzing,
