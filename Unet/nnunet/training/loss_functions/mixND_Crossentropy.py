@@ -112,7 +112,8 @@ class mixCrossentropyND(nn.Module):
             for kcls in range(y_one_hotmixup.size()[1]):
                 ydsclosspositionccls = (y_one_hotmixup[:, kcls] > 0) & (y_one_hotmixup[:, kcls] < 1)
                 ydsclossposition = ydsclossposition.float() + ydsclosspositionccls.float()
-            ydsclossposition = 1 - ydsclossposition # this would be 0/1, 0 indicates that there are portion which I dont want.
+            ydsclossposition = 1 - ydsclossposition 
+            ydsclossposition = ydsclossposition > 0 # this would be 0/1, 0 indicates that there are portion which I dont want.
             y_one_hotmixup = torch.floor(y_one_hotmixup)
 
         y_one_hotmixup = y_one_hotmixup.cuda()
